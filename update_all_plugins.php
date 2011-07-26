@@ -133,6 +133,7 @@ function uap_upgrade_all_plugins () {
                 $upgrader->upgrade($key);
                 //wp_update_plugins(); // This is required to replace the site transient if Plugin_Upgrader isn't subclassed
             }
+            fwrite(STDOUT, NEWLINE);
         }
 	// force refresh of plugin information once updates are complete
 	delete_site_transient('update_plugins');
