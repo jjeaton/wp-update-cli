@@ -13,7 +13,7 @@ Instructions
 1. Drop the `update_all_plugins.php` file into the root of your WordPress installation
 2. Execute the script from the command line: `php update_all_plugins.php`
 3. When asked if you would like to update, type 'y' or 'n' for each plugin
-4. Plugins are deactivated once upgraded, so login to your Dashboard and activate the upgraded plugins
+4. Login to your WP Dashboard and make sure nothing is broken.
 
 TODO
 -------
