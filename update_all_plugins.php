@@ -192,22 +192,7 @@ function uap_activate_all_plugins() {
 
 /* Only run if the script has been run from the command line */
 if (!empty($argc) && strstr($argv[0], basename(__FILE__))) {
-    if ( isset( $argv[1] ) ) {
-        switch( trim( $argv[1] ) ) {
-            case 'up':
-                fwrite(STDOUT, "Upgrading all plugins..." . NEWLINE);
-                uap_upgrade_all_plugins();
-                break;
-            case 'ref':
-                fwrite(STDOUT, "Refreshing plugin updates..." . NEWLINE);
-                wp_update_plugins();
-                break;
-            case 'deac':
-                fwrite(STDOUT, "Deactivating all plugins..." . NEWLINE);
-                uap_deactivate_all_plugins();
-                break;
-        }
-    }
+    uap_upgrade_all_plugins();
 }
 
 /*
