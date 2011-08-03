@@ -1,4 +1,4 @@
-﻿Command Line Updater for WordPress
+Command Line Updater for WordPress
 =============
 
 Interactive script to upgrade all plugins requiring an update in a 

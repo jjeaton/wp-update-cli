@@ -1,9 +1,10 @@
-﻿<?php
+<?php
 /*
  * Command Line updater for WordPress
- * project: wp-update-cli
- * file: update_all_plugins.php
- * author: Josh Eaton
+ * Project: wp-update-cli
+ * File: update_all_plugins.php
+ * Author: Josh Eaton
+ * Version: 0.2
  * URL: http://www.jjeaton.com/
  * 
  * Interactive script to upgrade all plugins requiring an update in a 
@@ -14,7 +15,7 @@
  * 1. Drop the update_all_plugins.php file into the root of your WordPress installation
  * 2. Execute the script from the command line: php update_all_plugins.php
  * 3. When asked if you would like to update, type 'y' or 'n' for each plugin
- * 4. Plugins are deactivated once upgraded, so login to your Dashboard and activate the upgraded plugins
+ * 4. Login to your WP Dashboard and make sure nothing is broken.
  * 
  * TODO: command line argument for non-interactive run
  * TODO: print out all plugins to upgrade first
@@ -61,7 +62,7 @@ include ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
  * Plugin Upgrader class for WordPress Plugins
  * Subclass of Plugin_Upgrader
  */
-class JJE_Plugin_Upgrader extends Plugin_Upgrader {
+class UAP_Plugin_Upgrader extends Plugin_Upgrader {
 
     /* Override Upgrade function to remove the delete_site_transient call
      * which prevented upgrading more than one plugin at a time.
@@ -120,17 +121,21 @@ function uap_upgrade_all_plugins () {
     // Check if plugins need updates
 	if ( ! empty($update_plugins->response) ) {
 		$plugins_needupdate = $update_plugins->response;
+        $upgrader = new UAP_Plugin_Upgrader();
 		foreach ($plugins_needupdate as $key => $plugin) {
-			fwrite(STDOUT, $plugin->slug . ' -> ' . $plugin->new_version . NEWLINE);
-            $upgrader = new JJE_Plugin_Upgrader();
-
             // Ask the user if they would like to upgrade the plugin
+            fwrite(STDOUT, $plugin->slug . ' -> ' . $plugin->new_version . NEWLINE);
             fwrite(STDOUT, "Would you like to upgrade this plugin (y/n)?\n");
             $continue = fgets(STDIN);
 
             // Upgrade the plugin
             if (trim($continue) == "y") {
+                // Deactivate
+                deactivate_plugins($key, true);
+                // Run the upgrade
                 $upgrader->upgrade($key);
+                // Re-activate
+                uap_run_activate_plugin($key);
                 //wp_update_plugins(); // This is required to replace the site transient if Plugin_Upgrader isn't subclassed
             }
             fwrite(STDOUT, NEWLINE);
@@ -143,21 +148,66 @@ function uap_upgrade_all_plugins () {
 }
 
 /*
- * Not currently used, could be used in the future to deactivate all plugins
- * prior to running the upgrades.
+ * Re-activate a plugin after upgrade
+ * from: http://wordpress.stackexchange.com/questions/4041/how-to-activate-plugins-via-code
+ * 
+ * activate_plugin() from wp-admin/includes/plugin.php may work, but this is less risky
+ */
+function uap_run_activate_plugin( $plugin ) {
+    $current = get_option( 'active_plugins' );
+    $plugin = plugin_basename( trim( $plugin ) );
+
+    if ( !in_array( $plugin, $current ) ) {
+        $current[] = $plugin;
+        sort( $current );
+        do_action( 'activate_plugin', trim( $plugin ) );
+        update_option( 'active_plugins', $current );
+        do_action( 'activate_' . trim( $plugin ) );
+        do_action( 'activated_plugin', trim( $plugin) );
+    }
+
+    return null;
+}
+
+/*
+ * Deactivates all active plugins
+ * Not currently used.
  */
 function uap_deactivate_all_plugins() {
     $active_plugins = get_option('active_plugins');
-    print_r($active_plugins);
-    $deactivate = array();
-    update_option('active_plugins', $deactivate);
-    $active_plugins = get_option('active_plugins');
-    print_r($active_plugins);
+    deactivate_plugins($active_plugins, true);
+}
+
+/*
+ * Activates all installed plugins
+ * Not currently used.
+ */
+function uap_activate_all_plugins() {
+    $installed_plugins = get_plugins();
+    foreach ( $installed_plugins as $plugin => $info) {
+        fwrite(STDOUT, "Activating: " . $info['Name'] . " v" . $info['Version'] . NEWLINE);
+        uap_run_activate_plugin($plugin);
+    }
 }
 
 /* Only run if the script has been run from the command line */
 if (!empty($argc) && strstr($argv[0], basename(__FILE__))) {
-	uap_upgrade_all_plugins();
+    if ( isset( $argv[1] ) ) {
+        switch( trim( $argv[1] ) ) {
+            case 'up':
+                fwrite(STDOUT, "Upgrading all plugins..." . NEWLINE);
+                uap_upgrade_all_plugins();
+                break;
+            case 'ref':
+                fwrite(STDOUT, "Refreshing plugin updates..." . NEWLINE);
+                wp_update_plugins();
+                break;
+            case 'deac':
+                fwrite(STDOUT, "Deactivating all plugins..." . NEWLINE);
+                uap_deactivate_all_plugins();
+                break;
+        }
+    }
 }
 
 /*
@@ -174,7 +224,5 @@ $options = array(   'package'     => $plugin->package,
                     'hook_extra'        => array()
 );
 $upgrader->run($options);
-
 */
 ?>
-
