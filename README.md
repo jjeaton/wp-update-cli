@@ -6,7 +6,7 @@ WordPress installation from the command line. Useful when security and
 file permissions prevent upgrades from the Dashboard.
 
 Author: Josh Eaton  
-Author URL: [http://www.jjeaton.com/](http://www.jjeaton.com/)
+Author URL: [http://www.josheaton.org/](http://www.josheaton.org)
 
 Instructions
 -------
@@ -22,3 +22,7 @@ TODO
 * Add versions for core upgrade and theme upgrade
 * Error checking and handling
 * Notifications
+
+Changelog
+-------
+* v0.3 - Updated for WP 3.3.1
