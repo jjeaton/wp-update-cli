@@ -4,19 +4,19 @@
  * Project: wp-update-cli
  * File: update_all_plugins.php
  * Author: Josh Eaton
- * Version: 0.2
+ * Version: 0.3
  * URL: http://www.jjeaton.com/
- * 
- * Interactive script to upgrade all plugins requiring an update in a 
- * WordPress installation from the command line. Useful when security and 
+ *
+ * Interactive script to upgrade all plugins requiring an update in a
+ * WordPress installation from the command line. Useful when security and
  * file permissions prevent upgrades from the Dashboard.
- * 
+ *
  * Instructions:
  * 1. Drop the update_all_plugins.php file into the root of your WordPress installation
  * 2. Execute the script from the command line: php update_all_plugins.php
  * 3. When asked if you would like to update, type 'y' or 'n' for each plugin
  * 4. Login to your WP Dashboard and make sure nothing is broken.
- * 
+ *
  * TODO: command line argument for non-interactive run
  * TODO: print out all plugins to upgrade first
  * TODO: allow selection of an individual plugin for upgrade?
@@ -25,10 +25,10 @@
  * TODO: Notifications
 */
 
-/*  Copyright 2011 Josh Eaton (email : josh at jjeaton com)
+/*  Copyright 2012 Josh Eaton (email : josh at jjeaton com)
 
     This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License, version 2, as 
+    it under the terms of the GNU General Public License, version 2, as
     published by the Free Software Foundation.
 
     This program is distributed in the hope that it will be useful,
@@ -57,6 +57,7 @@ include ABSPATH . 'wp-admin/includes/misc.php';
 include ABSPATH . 'wp-admin/includes/template.php';
 include ABSPATH . 'wp-admin/includes/file.php';
 include ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+include ABSPATH . 'wp-admin/includes/screen.php';
 
 /**
  * Plugin Upgrader class for WordPress Plugins
@@ -66,7 +67,7 @@ class UAP_Plugin_Upgrader extends Plugin_Upgrader {
 
     /* Override Upgrade function to remove the delete_site_transient call
      * which prevented upgrading more than one plugin at a time.
-     * 
+     *
      * Could cause an issue if this method is updated in wp-admin/includes/class-wp-upgrader.php
      * Alternative is to call wp_update_plugins() after each update to refresh
      * the transient, however this is very slow.
@@ -117,7 +118,7 @@ class UAP_Plugin_Upgrader extends Plugin_Upgrader {
 function uap_upgrade_all_plugins () {
     // Get all plugins to update
 	$update_plugins = get_site_transient('update_plugins');
-	
+
     // Check if plugins need updates
 	if ( ! empty($update_plugins->response) ) {
 		$plugins_needupdate = $update_plugins->response;
@@ -150,7 +151,7 @@ function uap_upgrade_all_plugins () {
 /*
  * Re-activate a plugin after upgrade
  * from: http://wordpress.stackexchange.com/questions/4041/how-to-activate-plugins-via-code
- * 
+ *
  * activate_plugin() from wp-admin/includes/plugin.php may work, but this is less risky
  */
 function uap_run_activate_plugin( $plugin ) {
