@@ -4,7 +4,7 @@
  * Project: wp-update-cli
  * File: update_all_plugins.php
  * Author: Josh Eaton
- * Version: 0.3
+ * Version: 0.3.1
  * URL: http://www.jjeaton.com/
  *
  * Interactive script to upgrade all plugins requiring an update in a
@@ -51,13 +51,17 @@ error_reporting(E_ALL & ~E_NOTICE);
 define('WP_USE_THEMES', false);
 require('./wp-blog-header.php');
 
+$currentVersion = get_bloginfo( 'version' );
+
 /* Includes required by the script (found through trial and error) */
 include ABSPATH . 'wp-admin/includes/plugin.php';
 include ABSPATH . 'wp-admin/includes/misc.php';
 include ABSPATH . 'wp-admin/includes/template.php';
 include ABSPATH . 'wp-admin/includes/file.php';
 include ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
-include ABSPATH . 'wp-admin/includes/screen.php';
+if ( version_compare( $currentVersion, '3.3.0', ">=" ) ) {
+	include ABSPATH . 'wp-admin/includes/screen.php';
+}
 
 /**
  * Plugin Upgrader class for WordPress Plugins
