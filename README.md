@@ -25,4 +25,5 @@ TODO
 
 Changelog
 -------
+* v0.4 - Now uses `wp-load.php` instead of `wp-blog-header.php` and disables cron. Based on info from Otto on the wp-hackers list
 * v0.3 - Updated for WP 3.3.1
