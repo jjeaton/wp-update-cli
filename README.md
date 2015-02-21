@@ -1,6 +1,11 @@
 Command Line Updater for WordPress
 =============
 
+----
+**This script is no longer maintained. Please use the awesome [WP-CLI](http://wp-cli.org/) instead!**
+
+----
+
 Interactive script to upgrade all plugins requiring an update in a 
 WordPress installation from the command line. Useful when security and 
 file permissions prevent upgrades from the Dashboard.
